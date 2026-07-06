@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fieldnote — Learn by doing. Log what you build.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAEEE7;
+    --paper-line:#CBD3C4;
+    --ink:#1B2E28;
+    --ink-soft:#4A5C52;
+    --pine:#2F6F5E;
+    --ochre:#D9772E;
+    --brick:#C4432B;
+    --card:#F5F6F1;
+    --radius:2px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    line-height:1.55;
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 32px;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:700; letter-spacing:-0.01em; color:var(--ink);}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--pine); font-weight:600;
+  }
+
+  /* stamp */
+  .stamp{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:112px; height:112px; border-radius:50%;
+    border:2px dashed var(--brick);
+    color:var(--brick);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    text-align:center; transform:rotate(-9deg);
+    line-height:1.3;
+  }
+
+  /* nav */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(234,238,231,0.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--paper-line);
+  }
+  nav{display:flex; align-items:center; justify-content:space-between; padding:18px 0;}
+  .logo{font-family:'Fraunces', serif; font-weight:700; font-size:22px; display:flex; align-items:center; gap:8px;}
+  .logo::before{content:"◉"; color:var(--ochre); font-size:16px;}
+  .navlinks{display:flex; gap:34px; font-size:13px; letter-spacing:.03em;}
+  .navlinks a{position:relative; padding:4px 0; color:var(--ink-soft); transition:color .2s;}
+  .navlinks a:hover{color:var(--pine);}
+  .navlinks a:focus-visible, a:focus-visible, button:focus-visible{outline:2px solid var(--pine); outline-offset:3px;}
+  .navcta{
+    font-size:13px; font-weight:600; padding:9px 18px; border:1.5px solid var(--ink);
+    border-radius:var(--radius); transition:.2s;
+  }
+  .navcta:hover{background:var(--ink); color:var(--paper);}
+  .menu-btn{display:none; background:none; border:none; font-size:22px; cursor:pointer; color:var(--ink);}
+
+  /* hero */
+  .hero{padding:96px 0 80px; position:relative;}
+  .hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:60px; align-items:center;}
+  .hero h1{font-size:clamp(38px,5.4vw,64px); line-height:1.03; margin:18px 0 22px;}
+  .hero h1 em{font-style:italic; color:var(--pine);}
+  .hero p{font-size:16px; color:var(--ink-soft); max-width:480px; margin-bottom:30px;}
+  .btn-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    display:inline-block; padding:13px 24px; border-radius:var(--radius);
+    font-size:14px; font-weight:600; font-family:'IBM Plex Mono',monospace;
+    transition:.2s; border:1.5px solid transparent;
+  }
+  .btn-primary{background:var(--pine); color:#fff;}
+  .btn-primary:hover{background:#255a4c;}
+  .btn-ghost{border-color:var(--ink); color:var(--ink);}
+  .btn-ghost:hover{background:var(--ink); color:var(--paper);}
+  .hero-card{
+    background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius);
+    padding:28px; position:relative; box-shadow:6px 6px 0 var(--ochre);
+  }
+  .hero-card .stamp{position:absolute; top:-30px; right:-20px;}
+  .logline{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); border-bottom:1px dashed var(--paper-line); padding:10px 0;}
+  .logline:last-child{border-bottom:none;}
+  .logline b{color:var(--ink); font-weight:600;}
+
+  section{padding:88px 0;}
+  .section-head{max-width:640px; margin-bottom:52px;}
+  .section-head h2{font-size:clamp(28px,3.6vw,42px); margin-top:10px;}
+  .section-head p{color:var(--ink-soft); margin-top:14px; font-size:15px;}
+
+  /* about */
+  .about{border-top:1px solid var(--paper-line);}
+  .about-grid{display:grid; grid-template-columns:.9fr 1.1fr; gap:64px;}
+  .margin-note{border-left:2px solid var(--ochre); padding-left:18px; font-size:13px; color:var(--ink-soft); font-style:italic; margin-top:24px;}
+  .stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:36px;}
+  .stat{border-top:2px solid var(--ink); padding-top:10px;}
+  .stat .num{font-family:'Fraunces',serif; font-size:34px; font-weight:700; color:var(--pine);}
+  .stat .label{font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-top:4px;}
+  .about p + p{margin-top:16px;}
+  .about p{color:var(--ink-soft); font-size:15px;}
+
+  /* programs / services */
+  .programs{background:var(--card); border-top:1px solid var(--paper-line); border-bottom:1px solid var(--paper-line);}
+  .program-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+  .program-card{
+    background:var(--paper); border:1px solid var(--paper-line); border-radius:var(--radius);
+    padding:26px; position:relative; transition:transform .2s, box-shadow .2s;
+  }
+  .program-card:hover{transform:translateY(-4px); box-shadow:5px 5px 0 var(--pine);}
+  .tag{
+    display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 10px; border-radius:20px; margin-bottom:16px;
+  }
+  .tag.foundation{background:#DCEAE4; color:var(--pine);}
+  .tag.applied{background:#F6E3D1; color:var(--ochre);}
+  .tag.advanced{background:#F3D9D2; color:var(--brick);}
+  .program-card h3{font-size:19px; margin-bottom:10px;}
+  .program-card p{font-size:13.5px; color:var(--ink-soft); margin-bottom:16px;}
+  .program-meta{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); border-top:1px dashed var(--paper-line); padding-top:12px;}
+
+  /* process */
+  .process-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:30px;}
+  .process-step{position:relative; padding-left:0;}
+  .process-step .n{font-family:'Fraunces',serif; font-size:46px; font-weight:700; color:var(--paper-line); line-height:1;}
+  .process-step h3{margin:12px 0 8px; font-size:18px;}
+  .process-step p{font-size:14px; color:var(--ink-soft);}
+
+  /* testimonials as logbook */
+  .logbook{background:var(--card); border-top:1px solid var(--paper-line); border-bottom:1px solid var(--paper-line);}
+  .entry-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
+  .entry{
+    background:var(--paper); border:1px solid var(--paper-line); padding:24px; border-radius:var(--radius);
+  }
+  .entry-top{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px;}
+  .entry blockquote{font-family:'Fraunces',serif; font-style:italic; font-size:17px; color:var(--ink); margin-bottom:14px;}
+  .entry .who{font-size:12.5px; color:var(--ink-soft);}
+  .entry .who b{color:var(--ink);}
+
+  /* mentors */
+  .mentor-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  .mentor{text-align:left;}
+  .mentor .avatar{
+    width:100%; aspect-ratio:1; border-radius:var(--radius); background:linear-gradient(135deg,var(--pine),var(--paper-line));
+    margin-bottom:14px; position:relative; overflow:hidden;
+  }
+  .mentor .avatar::after{content:attr(data-initials); position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Fraunces',serif; font-size:30px; font-weight:700;}
+  .mentor h3{font-size:15px; margin-bottom:2px;}
+  .mentor .role{font-size:12px; color:var(--ink-soft);}
+
+  /* contact */
+  .contact{border-top:1px solid var(--paper-line);}
+  .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:6px;}
+  .field input, .field textarea{
+    width:100%; background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius);
+    padding:12px 14px; font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus{outline:2px solid var(--pine); outline-offset:1px; border-color:var(--pine);}
+  .field textarea{resize:vertical; min-height:110px;}
+  .contact-info{border-left:2px solid var(--ochre); padding-left:28px;}
+  .contact-info .row{margin-bottom:22px;}
+  .contact-info .row .k{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:4px;}
+  .contact-info .row .v{font-size:15px; font-weight:600;}
+  .social-row{display:flex; gap:14px; margin-top:20px;}
+  .social-row a{border:1px solid var(--ink); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:13px; transition:.2s;}
+  .social-row a:hover{background:var(--ink); color:var(--paper);}
+
+  footer{padding:40px 0; border-top:1px solid var(--paper-line);}
+  .foot-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:12.5px; color:var(--ink-soft);}
+  .foot-links{display:flex; gap:22px;}
+
+  @media (max-width:860px){
+    .navlinks{display:none;}
+    .menu-btn{display:block;}
+    .hero-grid, .about-grid, .contact-grid{grid-template-columns:1fr;}
+    .program-grid, .entry-grid{grid-template-columns:1fr;}
+    .process-grid{grid-template-columns:1fr;}
+    .mentor-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-row{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <a href="#home" class="logo">Fieldnote</a>
+      <div class="navlinks">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#programs">Programs</a>
+        <a href="#process">How it works</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a href="#contact" class="navcta">Enrol</a>
+      <button class="menu-btn" aria-label="menu">☰</button>
+    </nav>
+  </div>
+</header>
+
+<!-- HOMEPAGE / HERO -->
+<section class="hero" id="home">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Field journal 001 — cohort applications open</span>
+      <h1>Learn by doing.<br><em>Log</em> what you build.</h1>
+      <p>Fieldnote is a practical-skills school. No lecture halls — you ship real projects with a mentor beside you, and every session gets logged like fieldwork, so you can see exactly how far you've come.</p>
+      <div class="btn-row">
+        <a href="#programs" class="btn btn-primary">Browse programs</a>
+        <a href="#about" class="btn btn-ghost">Read our story</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="stamp">Verified<br>learner<br>2026</div>
+      <div class="logline"><span>Learner</span><b>Amara O.</b></div>
+      <div class="logline"><span>Program</span><b>Web Dev Fieldwork</b></div>
+      <div class="logline"><span>Week</span><b>07 of 12</b></div>
+      <div class="logline"><span>Last shipped</span><b>Portfolio API</b></div>
+      <div class="logline"><span>Mentor note</span><b>"Ready for review"</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <span class="eyebrow">About us</span>
+      <h2>We treat learning like fieldwork, not a syllabus.</h2>
+      <div class="margin-note">"You don't learn a trade by memorising it. You learn it by doing it badly, then a little less badly." — Fieldnote founding note, 2022</div>
+    </div>
+    <div>
+      <p>Fieldnote started with a simple complaint: most online courses hand out certificates for watching videos, not for building anything real. So we built the opposite — a place where every learner keeps an actual log of what they shipped, who reviewed it, and what they'd do differently next time.</p>
+      <p>Today we run twelve-week programs across web development, data literacy, product design, and technical writing, each led by a working practitioner who mentors a small cohort instead of lecturing a crowd. No pre-recorded courses, no vanity certificates — just projects, feedback, and a log you can actually show an employer.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="num">2,300+</div><div class="label">Projects logged</div></div>
+        <div class="stat"><div class="num">94%</div><div class="label">Cohort completion</div></div>
+        <div class="stat"><div class="num">38</div><div class="label">Practitioner mentors</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES / PROGRAMS -->
+<section class="programs" id="programs">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Programs</span>
+      <h2>Pick a trail, not a topic.</h2>
+      <p>Every program runs in small cohorts with one mentor and a fixed shipping schedule — you always know what's due and who's reading it.</p>
+    </div>
+    <div class="program-grid">
+      <div class="program-card">
+        <span class="tag foundation">Foundation</span>
+        <h3>Web Dev Fieldwork</h3>
+        <p>Ship a new site or app feature every week, from static pages to a working full-stack project by week twelve.</p>
+        <div class="program-meta"><span>12 weeks</span><span>Cohort of 14</span></div>
+      </div>
+      <div class="program-card">
+        <span class="tag applied">Applied</span>
+        <h3>Data Literacy Trail</h3>
+        <p>Learn to clean, question, and visualise real datasets — finish with a public dashboard built from data you sourced yourself.</p>
+        <div class="program-meta"><span>8 weeks</span><span>Cohort of 16</span></div>
+      </div>
+      <div class="program-card">
+        <span class="tag advanced">Advanced</span>
+        <h3>Product Design Apprenticeship</h3>
+        <p>Pair with a mentor on a live design problem, from research through a shippable prototype and a critique panel.</p>
+        <div class="program-meta"><span>10 weeks</span><span>Cohort of 10</span></div>
+      </div>
+      <div class="program-card">
+        <span class="tag foundation">Foundation</span>
+        <h3>Technical Writing Bench</h3>
+        <p>Turn dense, technical work into docs people actually read — practised on real open-source and product documentation.</p>
+        <div class="program-meta"><span>6 weeks</span><span>Cohort of 18</span></div>
+      </div>
+      <div class="program-card">
+        <span class="tag applied">Applied</span>
+        <h3>Data Structures Field Notes</h3>
+        <p>Interview-ready fundamentals, taught through weekly problem logs reviewed line-by-line by your mentor.</p>
+        <div class="program-meta"><span>8 weeks</span><span>Cohort of 20</span></div>
+      </div>
+      <div class="program-card">
+        <span class="tag advanced">Advanced</span>
+        <h3>Founder's Build Sprint</h3>
+        <p>For learners with an idea already — go from concept to a live, user-tested MVP with weekly founder check-ins.</p>
+        <div class="program-meta"><span>10 weeks</span><span>Cohort of 12</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="process">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps, in order, every cohort.</h2>
+    </div>
+    <div class="process-grid">
+      <div class="process-step">
+        <div class="n">01</div>
+        <h3>Apply and get matched</h3>
+        <p>Tell us what you want to build. We place you in a cohort with a mentor who works in that field today.</p>
+      </div>
+      <div class="process-step">
+        <div class="n">02</div>
+        <h3>Ship weekly, get reviewed</h3>
+        <p>Every week ends with a real deliverable and written feedback from your mentor — logged, not lost in a forum.</p>
+      </div>
+      <div class="process-step">
+        <div class="n">03</div>
+        <h3>Graduate with a log, not just a certificate</h3>
+        <p>Leave with a public record of everything you built, reviewed and revised — something you can actually show.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (Additional section) -->
+<section class="logbook">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">From the logbook</span>
+      <h2>Entries from past cohorts.</h2>
+    </div>
+    <div class="entry-grid">
+      <div class="entry">
+        <div class="entry-top"><span>Web Dev Fieldwork</span><span>Week 12</span></div>
+        <blockquote>"By week four I had a mentor telling me exactly why my code broke instead of a forum thread ignoring my question."</blockquote>
+        <div class="who"><b>Rhea Malhotra</b> — now Frontend Engineer, Pune</div>
+      </div>
+      <div class="entry">
+        <div class="entry-top"><span>Data Literacy Trail</span><span>Week 08</span></div>
+        <blockquote>"I finished with a dashboard I built from scratch, not a quiz score. That's what got me the interview."</blockquote>
+        <div class="who"><b>Daniel Osei</b> — Data Analyst, Accra</div>
+      </div>
+      <div class="entry">
+        <div class="entry-top"><span>Product Design Apprenticeship</span><span>Week 10</span></div>
+        <blockquote>"The critique panel was terrifying and exactly what I needed before doing it for real at a job."</blockquote>
+        <div class="who"><b>Sofia Rinaldi</b> — Product Designer, Milan</div>
+      </div>
+      <div class="entry">
+        <div class="entry-top"><span>Founder's Build Sprint</span><span>Week 10</span></div>
+        <blockquote>"Ten weeks of weekly deadlines got my side-project further than two years of working on it alone."</blockquote>
+        <div class="who"><b>Kabir Sen</b> — Founder, Delhi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENTORS (Additional section) -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Mentors</span>
+      <h2>Taught by people still doing the work.</h2>
+      <p>Every mentor is a working practitioner, teaching alongside their day job — not a full-time instructor reading slides.</p>
+    </div>
+    <div class="mentor-grid">
+      <div class="mentor"><div class="avatar" data-initials="NV"></div><h3>Nikhil Verma</h3><div class="role">Senior Engineer, mentors Web Dev Fieldwork</div></div>
+      <div class="mentor"><div class="avatar" data-initials="LC"></div><h3>Laura Chen</h3><div class="role">Data Scientist, mentors Data Literacy Trail</div></div>
+      <div class="mentor"><div class="avatar" data-initials="OA"></div><h3>Oluwaseun Adeyemi</h3><div class="role">Product Designer, mentors Design Apprenticeship</div></div>
+      <div class="mentor"><div class="avatar" data-initials="MK"></div><h3>Meera Krishnan</h3><div class="role">Docs Lead, mentors Technical Writing Bench</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <span class="eyebrow">Contact</span>
+      <h2 style="margin:10px 0 20px; font-size:32px;">Tell us what you want to build.</h2>
+      <form onsubmit="event.preventDefault(); document.getElementById('formNote').style.display='block';">
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" type="text" placeholder="Your full name" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="interest">Program of interest</label>
+          <input id="interest" type="text" placeholder="e.g. Web Dev Fieldwork">
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" placeholder="What are you hoping to build?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="border:none; cursor:pointer;">Send message</button>
+        <p id="formNote" style="display:none; margin-top:14px; font-size:13px; color:var(--pine);">Logged. We'll write back within two working days.</p>
+      </form>
+    </div>
+    <div class="contact-info">
+      <div class="row"><div class="k">Email</div><div class="v">hello@fieldnote.edu</div></div>
+      <div class="row"><div class="k">Cohort applications</div><div class="v">Open until 20 July 2026</div></div>
+      <div class="row"><div class="k">Based in</div><div class="v">Remote-first, mentors worldwide</div></div>
+      <div class="social-row">
+        <a href="#" aria-label="LinkedIn">in</a>
+        <a href="#" aria-label="Instagram">ig</a>
+        <a href="#" aria-label="X">x</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>© 2026 Fieldnote. All entries logged, nothing autoplayed.</span>
+    <div class="foot-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#programs">Programs</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
